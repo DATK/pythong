@@ -8,7 +8,6 @@ import sys
 
 
 
-
 class ImageLoader:
     
     def __init__(self):
@@ -30,26 +29,13 @@ class ImageLoader:
     
 class Images:
     
-    def __init__(self,image,pos=(0,0),isphone=False,speed=-5,width=1280):
+    def __init__(self,image,pos=(0,0)):
         self.image=image
-        self.x,self.y=pos
-        self.isphone=isphone
-        self.speedx=speed
-        self.speedy=0
-        self.width=1280
-
-    def init_(self,scr):
-        self.move()
-        scr.blit(self.image,(self.x,self.y))
+        self.pos=pos
     
-    def move(self):
-        if self.isphone:
-            width=self.image.get_width()
-            if self.x<=0-width:
-                self.x=self.width
-            self.x+=self.speedx
-            self.y+=self.speedy
-
+    def init_(self,scr):
+        scr.blit(self.image,self.pos)
+        
     def get_type(self):
         return "image"
     
@@ -117,50 +103,32 @@ class Bot:
 
 class Weapon:
     
-    def __init__(self,damage=10,vectorx=1,shoot_parms=(10,140),start_spread=(-7,-7),permanent_spread=(-6,6),kickback=0,trajectory=None):
+    def __init__(self,obj):
+        self.obj=obj
         self.bullets=[]
-        self.start_spread=start_spread
-        self.kickback=kickback
-        self.permanent_spread=permanent_spread
-        self.infbullets=True
-        self.damage=damage
-        self.vectorX=vectorx
-        self.shoot_parms=shoot_parms
-        if trajectory==None:
-            self.trajectory=self.defaul_trajectory
-        else:
-            self.trajectory=trajectory
 
-    def load_bullets(self,bulets,eng):
-        self.bulets=[i for i in bulets]
+    def load_bullets(self,bulets):
+        self.bulets=bulets
         for i in self.bulets:
-            i.speed*=self.vectorX
-            i.permanent_spread=self.permanent_spread
-            i.set_trajectory(self.trajectory)
-            i.damage+=self.damage
-            eng.add_objects(i)
+            #eng.add_objects(i)
+            pass
         self.bulets_save=self.bulets
 
-    def defaul_trajectory(self,x): #return y cord
-        return x*0
-
-    def get_trajectory(self,functionX): #fucntion is get only x and return y
-        self.trajectory=functionX
-
-    def shoot(self,x,y):
+    def shoot(self):
         if self.bulets!=[]:
             #rint("shoot"+str(self.i))
-            self.bulets[0].set_start_cords(x,y+r.randint(self.start_spread[0],self.start_spread[1]))
+            self.bulets[0].x=self.x+self.width
+            self.bulets[0].y=self.y+self.height//2+r.randint(-7,7)
             self.bulets[0].isdraw=True
             self.bulets=self.bulets[1:]
+            self.x-=self.otdacha
             #self.i+=1
         elif self.infbullets:
             self.bulets=self.bulets_save
-        
 
 class Bullet:
     
-    def __init__(self,texure_bullet=None,width=5,height=5,damage=5,speed=3,player=False):
+    def __init__(self,texure_bullet=None,width=5,height=5,damage=5,speed=3):
         if texure_bullet==None:
             self.texure_bullet=pg.Surface((width,height))
             self.texure_bullet.fill((255,0,0))
@@ -174,16 +142,8 @@ class Bullet:
         self.damage=damage
         self.speed=speed
         self.isdraw=False
-        self.player=player
+        self.player=False
         self.granis=(0,0,1280,720)
-        self.permanent_spread=(-1,1)
-
-    def set_start_cords(self,x,y):
-        self.x=x
-        self.y=y
-
-    def set_trajectory(self,functionX):
-        self.trajectory=functionX
 
     def get_damage(self):
         self.isdraw=False
@@ -197,18 +157,18 @@ class Bullet:
         if self.isdraw:
             self.rc=pg.Rect(self.x,self.y,self.texure_bullet.get_width(),self.texure_bullet.get_height())
             scr.blit(self.texure_bullet,(self.x,self.y))
-            self.x+=self.speed
-            self.y=self.y+self.trajectory(self.x)
-            self.y+=r.randint(self.permanent_spread[0],self.permanent_spread[1])
+            self.y+=r.randint(-6,6)
+            if not self.player:
+                self.x-=self.speed
+            else:
+                self.x+=self.speed
             #print("drawed")
             if self.x>self.granis[2] or self.x<self.granis[0]:
                 self.isdraw=False
-                self.x,self.y=-100,-100
-                self.rc=pg.Rect(self.x,self.y,self.texure_bullet.get_width(),self.texure_bullet.get_height())
         else:
             self.x,self.y=-100,-100
             self.rc=pg.Rect(self.x,self.y,self.texure_bullet.get_width(),self.texure_bullet.get_height())
-
+                
     def get_type(self):
         return "bullet"
         
@@ -230,16 +190,37 @@ class Player:
         self.speedx=self.speed
         self.vector=[0,0]
         self.speedy=self.speed
+        self.bulets=[]
+        self.ishoot=False
+        self.infbullets=False
+        self.bulets_save=[]
         self.speed_shoot=1
         self.count=0
         self.max_shootSpeed=10
-        self.has_weapon=False
+        self.otdacha=0
 
+    def add_bullets(self,bulets,eng):
+        self.bulets=[i for i in bulets if i.player]
+        for i in self.bulets:
+            eng.add_objects(i)
+        self.bulets_save=self.bulets
 
-    def get_weapon(self,weapon):
-        self.weapon=weapon
-        self.has_weapon=True
-        self.speed_shoot,self.max_shootSpeed=weapon.shoot_parms[0],weapon.shoot_parms[1]
+    def set_shoot_parms(self,speed,max_speed):
+        self.speed_shoot=speed
+        self.max_shootSpeed=max_speed
+
+    def shoot(self):
+        if self.bulets!=[]:
+            #rint("shoot"+str(self.i))
+            self.bulets[0].x=self.x+self.width
+            self.bulets[0].y=self.y+self.height//2+r.randint(-7,7)
+            self.bulets[0].isdraw=True
+            self.bulets=self.bulets[1:]
+            self.x-=self.otdacha
+            #self.i+=1
+        elif self.infbullets:
+            self.bulets=self.bulets_save
+
 
     def set_texture(self,surface):
         self.texture=pg.transform.scale(surface,size=(self.width,self.height))
@@ -256,10 +237,9 @@ class Player:
             self.vector[0]-=1
         if keys[pg.K_d]:
             self.vector[0]+=1
-        if keys[pg.K_SPACE] and self.has_weapon:
+        if keys[pg.K_SPACE] and pg.KEYDOWN:
             if self.count>=self.max_shootSpeed:
-                self.weapon.shoot(self.x+self.width,self.y+self.height//2)
-                self.x-=self.weapon.kickback
+                self.shoot()
                 self.count=0
         self.count+=self.speed_shoot      
         self.x+=self.vector[0]*self.speedx
@@ -369,7 +349,7 @@ class Circle:
 
 class Enemy:
 
-    def __init__(self,start_xy=(),width=10,height=10,texture=None,hp=10,stopX=-100):
+    def __init__(self,start_xy=(),width=10,height=10,texture=None,hp=10):
         self.x,self.y=start_xy
         self.width,self.height=width,height
         self.hp=hp
@@ -384,14 +364,32 @@ class Enemy:
         self.vector=[0,0]
         self.hpsave=self.hp
         self.mx,self.my=1280,700
+        self.bulets=[]
         self.live=True
+        self.infbullets=False
+        self.bulets_save=[]
         self.speed_shoot=1
         self.count=0
         self.max_shootSpeed=10
-        self.has_weapon=False
-        self.stopX=stopX
-
-
+        self.otdacha=5
+    
+    def add_bullets(self,bulets,eng):
+        self.bulets=[i for i in bulets if not i.player]
+        for i in self.bulets:
+            eng.add_objects(i)
+        self.bulets_save=self.bulets
+    
+    def shoot(self):
+        if self.bulets!=[]:
+            #rint("shoot"+str(self.i))
+            self.bulets[0].x=self.x
+            self.bulets[0].y=self.y+self.height//2+r.randint(-7,7)
+            self.bulets[0].isdraw=True
+            self.bulets=self.bulets[1:]
+            self.x+=self.otdacha
+        elif self.infbullets:
+            self.bulets=self.bulets_save
+    
     def set_texture(self,surface):
         self.texture=pg.transform.scale(surface,size=(self.width,self.height))
         self.rc=self.texture.get_rect()    
@@ -400,11 +398,6 @@ class Enemy:
         if len(cord) != 2:
             cord = (self.x, self.y)
         self.x, self.y = cord
-
-    def get_weapon(self,weapon):
-        self.weapon=weapon
-        self.has_weapon=True
-        self.speed_shoot,self.max_shootSpeed=weapon.shoot_parms[0],weapon.shoot_parms[1]
 
     def collider_chek(self,obj):
         if pg.Rect.colliderect(self.rc,obj.rc) and obj.player:
@@ -416,6 +409,10 @@ class Enemy:
     def set_x(self, x):
         self.x = x
 
+    def set_shoot_parms(self,speed,max_speed):
+        self.speed_shoot=speed
+        self.max_shootSpeed=max_speed
+
     def set_y(self, y):
         self.x = y
 
@@ -426,20 +423,17 @@ class Enemy:
             scr.blit(self.texture,(self.x,self.y))
             self.rc=pg.Rect(self.x,self.y,self.texture.get_width(),self.texture.get_height())
             self.x-=self.speed+r.randint(-1,2)
-            if self.count>=self.max_shootSpeed and self.has_weapon:
-                self.weapon.shoot(self.x,self.y+self.height//2)
-                self.x-=self.weapon.kickback
+            if self.count>=self.max_shootSpeed:
+                self.shoot()
                 self.count=0
             if self.hp<1 or self.x < 0:
                 self.hp=self.hpsave
                 self.x=self.mx
-                self.y=r.randint(50,self.my-100)
-            if self.x<=self.stopX:
-                self.speed=0
-                self.x=self.stopX
+                self.y=r.randint(50,self.my-70)
             self.count+=self.speed_shoot
         else:
             del self.rc
+        
         
         
     def draw_rect(self,scr):
