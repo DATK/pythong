@@ -35,8 +35,8 @@ class ImageLoader:
     
 class Image:
     
-    def __init__(self,image,pos=(0,0),isphone=False,formenu=False,speed=-5,width=1280,hieght=800):
-        self.image=pg.transform.scale(image,(width+3,hieght))
+    def __init__(self,image,pos=(0,0),isphone=False,formenu=False,speed=-5,width=1280):
+        self.image=image
         self.x,self.y=pos
         self.isphone=isphone
         self.speedx=speed
@@ -44,9 +44,6 @@ class Image:
         self.width=width
         self.isdraw=True
         self.forMenu=formenu
-        self.hieght=hieght
-
-
         
     def drawin(self):
         if self.isdraw:
@@ -61,7 +58,7 @@ class Image:
     
     def move(self):
         if self.isphone:
-            width=self.width
+            width=self.image.get_width()
             if self.x<=0-width:
                 self.x=self.width
             self.x+=self.speedx
@@ -226,9 +223,6 @@ class Bullet:
             self.x,self.y=-100,-100
             self.rc=pg.Rect(self.x,self.y,self.texure_bullet.get_width(),self.texure_bullet.get_height())
 
-    def draw_rect(self,scr):
-        pg.draw.rect(scr,(0,255,0),self.rc)
-    
     def get_type(self):
         return "bullet"
 
@@ -760,7 +754,6 @@ class Engine:
             pl.chek_colis(wall.rc)
         for bullet in self.objects["bullets"]:
             bullet.init_(self.display)
-            if showColision: bullet.draw_rect(self.display)
         for label in self.objects["lables"]:
             if not label.forMenu: label.show(self.display)
         for button in self.objects["buttons"]:

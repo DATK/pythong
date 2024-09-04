@@ -6,9 +6,12 @@ import sys
 with open("config.json","r",encoding="UTF-8") as f:
     data=json.load(f)
 kolvo_enemys=data['kolvo_enemys']
+kolvo_bullets_player=data['kolvo_bullets_player']
 kolvo_bullets_enemys=data['kolvo_bullets_enemys']
+otdacha_enemy=data['otdacha_enemy']
 speed_enemys=data['speed_enemys']
 speed_player=data['speed_player']
+enemys_speed_shoot=data['enemys_speed_shoot']
 FPS=data['FPS_MAX']
 
 eng = Engine()
@@ -25,43 +28,9 @@ enemy_texures=[img_loader.load("enemy1.png",colorkey=[True,(255,255,255)]),img_l
 bullet_texture=img_loader.load("bullet.png",colorkey=[True,(255,255,255)])
 bullet_texture_enemy=img_loader.load("bullet_enemy1.png",colorkey=[True,(255,255,255)])
 
-phone=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),isphone=True,speed=-1.7,width=WIDTH,hieght=HEIGH)
-phone2=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),isphone=True,pos=(WIDTH,0),speed=-1.7,width=WIDTH,hieght=HEIGH)
+phone=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),isphone=True,speed=-1.7,width=WIDTH)
+phone2=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),isphone=True,pos=(WIDTH+5,0),speed=-1.7,width=WIDTH)
 
-
-def settings():
-    if setingsButton.isdraw:
-        startButton.isdraw=False
-        exitButon.isdraw=False
-        debugButton.isdraw=False
-        setingsButton.isdraw=False
-        FpsLock60.isdraw=True
-        settingsTwo.isdraw=True
-        settingsThree.isdraw=True
-        settingsBackToMenu.isdraw=True
-        
-    else:
-        FpsLock60.isdraw=False
-        settingsTwo.isdraw=False
-        settingsThree.isdraw=False
-        settingsBackToMenu.isdraw=False
-        startButton.isdraw=True
-        exitButon.isdraw=True
-        debugButton.isdraw=True
-        setingsButton.isdraw=True
-
-def fpsLock():
-    if eng.fps==60:
-        eng.set_frame(1000)
-    else:
-        eng.set_frame(60)
-    if eng.fps==60:
-        FpsLock60.set_parms(40,aligin=(40,20),color_backgroud=ButtnOn)
-    else:
-        FpsLock60.set_parms(40,aligin=(40,20),color_backgroud=ButtnOff)            
-        
-ButtnOn=((255,255,255),(0,200,0))
-ButtnOff=((255,255,255),(100,0,0))
 startButton=Button(WIDTH*0.4,HEIGH*0.2,200,100,function=lambda: eng.changeScene(),formenu=True)
 startButton.text="Играть"
 startButton.set_parms(40,aligin=(40,20),color_backgroud=((255,255,255),(150,150,150)))
@@ -77,32 +46,6 @@ exitButon.set_parms(40,aligin=(40,20),color_backgroud=((255,255,255),(150,150,15
 debugButton=Button(WIDTH*0.4,HEIGH*0.60,200,100,function=lambda: eng.change_work_func("debug"),formenu=True)
 debugButton.text="Дебаг"
 debugButton.set_parms(40,aligin=(40,20),color_backgroud=((255,255,255),(150,150,150)))
-
-FpsLock60=Button(WIDTH*0.4,HEIGH*0.2,200,100,function=fpsLock,formenu=True)
-FpsLock60.text="Лок в 60 фпс"
-FpsLock60.isdraw=False
-FpsLock60.set_parms(40,aligin=(20,20),color_backgroud=ButtnOn)
-
-
-settingsTwo=Button(WIDTH*0.4,HEIGH*0.40,200,100,function=None,formenu=True)
-settingsTwo.text="Недоступно"
-settingsTwo.isdraw=False
-settingsTwo.set_parms(40,aligin=(1,20),color_backgroud=ButtnOff)
-
-settingsThree=Button(WIDTH*0.4,HEIGH*0.60,200,100,function=None,formenu=True)
-settingsThree.text="Недоступно"
-settingsThree.isdraw=False
-settingsThree.set_parms(40,aligin=(1,20),color_backgroud=ButtnOff)
-
-settingsBackToMenu=Button(WIDTH*0.4,HEIGH*0.80,200,100,function=settings,formenu=True)
-settingsBackToMenu.text="Вернуться"
-settingsBackToMenu.isdraw=False
-settingsBackToMenu.set_parms(38,aligin=(2,20),color_backgroud=((255,255,255),(150,150,150)))
-
-setingsButton=Button(WIDTH*0.4,HEIGH*0.40,200,100,function=settings,formenu=True)
-setingsButton.text="Настройки"
-setingsButton.set_parms(38,aligin=(2,20),color_backgroud=((255,255,255),(150,150,150)))
-
 
 
 fps=Label(0,0,120,40)
@@ -156,12 +99,9 @@ for enem in enemys:
     pistol_bullets_enemy=[Bullet(bullet_texture_enemy,30,21,1,r.randint(6,9),False,granis=(0,0,WIDTH,HEIGH)) for i in range(kolvo_bullets_enemys)]
     pistol_enmy.load_bullets(pistol_bullets_enemy,eng)
     enem.get_weapon(pistol_enmy)
-    enem.speed=speed_enemys
-
     
 player.set_texture(hero)
 eng.set_frame(FPS)
-
 
 player.get_weapon(pistol)
 
@@ -175,10 +115,9 @@ def debug():
     fps.show(eng.display,text=f"FPS - {int(eng.fps_now)}",isbackground=False)
     cords.show(eng.display,text=f"xy({player.x} {player.y})",isbackground=False)
     hp.show(eng.display,text=f"hp: {int(player.hp)}",isbackground=False)
-    enemyss.show(eng.display,text=f"enemys: {len(eng.objects['enemys'])}",isbackground=False)
+    enemyss.show(eng.display,text=f"enemys: {len(eng.objects["enemys"])}",isbackground=False)
     buls=len([i for i in eng.objects["bullets"] if i.isdraw])
     bulets_rightnow.show(eng.display,text=f"bullets: {buls}",isbackground=False)
-    print(f"phone1 {phone.x} phone2 {phone2.x}")
 
 
 
@@ -216,11 +155,6 @@ eng.add_objects(startButton)
 eng.add_objects(stopButton)
 eng.add_objects(debugButton)
 eng.add_objects(exitButon)
-eng.add_objects(setingsButton)
-eng.add_objects(FpsLock60)
-eng.add_objects(settingsTwo)
-eng.add_objects(settingsThree)
-eng.add_objects(settingsBackToMenu)
 [eng.add_objects(i) for i in enemys]
 
 
