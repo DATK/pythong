@@ -1,3 +1,0 @@
-WIDTH=1550
-HEIGH=800
-IMAGES_PATH="./src/images/"

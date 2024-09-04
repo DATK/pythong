@@ -1,9 +1,7 @@
 import pygame as pg
-from math import sin,cos
 import os
 import random as r
-from src.config import *
-from functools import cache
+from Engine.src.config import *
 import sys
 
 
@@ -27,20 +25,36 @@ class ImageLoader:
             surface=pg.transform.scale(surface,size=(surface.get_width()*scale[0],surface.get_height()*scale[1]))
         return surface
         
+    def load_bits(self,image_path):
+        try:
+            with open(image_path, "rb") as f:
+                image=f.read()
+        except:
+            image=None
+        return image
     
-class Images:
+class Image:
     
-    def __init__(self,image,pos=(0,0),isphone=False,speed=-5,width=1280):
+    def __init__(self,image,pos=(0,0),isphone=False,formenu=False,speed=-5,width=1280):
         self.image=image
         self.x,self.y=pos
         self.isphone=isphone
         self.speedx=speed
         self.speedy=0
-        self.width=1280
-
+        self.width=width
+        self.isdraw=True
+        self.forMenu=formenu
+        
+    def drawin(self):
+        if self.isdraw:
+            self.isdraw=False
+        else:
+            self.isdraw=True
+    
     def init_(self,scr):
-        self.move()
-        scr.blit(self.image,(self.x,self.y))
+        if self.isdraw:
+            self.move()
+            scr.blit(self.image,(self.x,self.y))
     
     def move(self):
         if self.isphone:
@@ -211,8 +225,78 @@ class Bullet:
 
     def get_type(self):
         return "bullet"
-        
+
+class Buf:
     
+    def __init__(self,hp=0,defense=0,):
+        self.hp=hp
+        self.defense=defense
+        
+    def init_(self):
+        return (self.hp,self.defense)
+
+class Box:
+
+    def __init__(self,pos=(0,0),hp=100,width=10,height=10,player=None,texture=None)   :
+        self.x,self.y=pos
+        self.width,self.height=width,height
+        self.obj=None
+        self.isdraw=True
+        self.hp=hp
+        self.player=player
+        if texture==None:
+            self.texture=pg.Surface((width,height))
+            self.texture.fill((255,0,0))
+        else:
+            self.texture=texture
+            self.texture=pg.transform.scale(self.texture,size=(self.width,self.height))
+        self.rc=self.texture.get_rect()
+
+    def init_(self,scr):
+        if self.isdraw:
+            scr.blit(self.texture,(self.x,self.y))
+            self.rc=pg.Rect(self.x,self.y,self.texture.get_width(),self.texture.get_height())
+            if self.hp<0:
+                self.isdraw=False
+                self.x,self.y=(-1000,-100)
+                self.rc=pg.Rect(self.x,self.y,self.texture.get_width(),self.texture.get_height())
+                if self.obj!=None:
+                    if self.type=="Weapon":
+                        self.player.get_weapon(self.obj)
+                    elif self.type=="Buf":
+                        self.player.hp += self.obj.init_()[0]
+                        self.player.defense+=self.obj.init_()[1]
+                        
+                        
+    def set_pos(self,pos=(0,0)):
+        self.x,self.y=pos
+        
+    def set_WH(self,wh=(0,0)):
+        self.width,self.y=wh
+        
+    def set_texture(self,surface):
+        self.texture=pg.transform.scale(surface,size=(self.width,self.height))
+        self.rc=self.texture.get_rect()
+    
+    def set_player(self,player):
+        self.player=player
+    
+    def set_obj(self,obj,type):
+        self.obj=obj
+        self.type=type
+        
+    def collider_chek(self,obj):
+        if pg.Rect.colliderect(self.rc,obj.rc) and obj.player:
+            get_damage=obj.get_damage()
+            self.hp-=get_damage
+            get_damage=0
+
+    def get_type(self):
+        return "enemy"
+
+    def draw_rect(self,scr):
+        if self.isdraw: pg.draw.rect(scr,(0,255,0),self.rc)
+
 class Player:
     
     def __init__(self,start_xy=(),width=10,height=10,texture=None,hp=100):
@@ -234,6 +318,8 @@ class Player:
         self.count=0
         self.max_shootSpeed=10
         self.has_weapon=False
+        self.defense=99
+        self.defense_koef=0.4
 
 
     def get_weapon(self,weapon):
@@ -245,7 +331,7 @@ class Player:
         self.texture=pg.transform.scale(surface,size=(self.width,self.height))
         self.rc=self.texture.get_rect()
     
-    def moving(self):
+    def moving_pc(self):
         self.vector=[0,0]
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:
@@ -266,7 +352,13 @@ class Player:
         self.y+=self.vector[1]*self.speedy
               
     def init_(self,scr):
-        self.moving()
+        self.moving_pc()
+        if self.defense<0:
+                self.defense=0
+        if self.defense>125:
+            self.defense=125
+        if self.hp>250:
+            self.hp=250
         scr.blit(self.texture,(self.x,self.y))
         self.rc=pg.Rect(self.x,self.y,self.texture.get_width(),self.texture.get_height())
         #print(self.rc)
@@ -274,8 +366,12 @@ class Player:
     def collider_chek(self,obj):
         if pg.Rect.colliderect(self.rc,obj.rc) and not obj.player:
             get_damage=obj.get_damage()
-            self.hp-=get_damage
-            get_damage=0
+            dmg=get_damage-get_damage*self.defense/100
+            if dmg<0:
+                dmg=0
+            self.hp-=dmg
+            dmg=0
+            self.defense-=self.defense_koef
             #self.texture=pg.transform.
             # 
    
@@ -302,7 +398,7 @@ class Player:
     def get_type(self):
         return "player"
  
- 
+
 class Wall:
     
     def __init__(self,start_xy=(0,0),width=10,height=10,texture=None):
@@ -366,7 +462,6 @@ class Circle:
         return "figure"
     
 
-
 class Enemy:
 
     def __init__(self,start_xy=(),width=10,height=10,texture=None,hp=10,stopX=-100):
@@ -390,6 +485,7 @@ class Enemy:
         self.max_shootSpeed=10
         self.has_weapon=False
         self.stopX=stopX
+        self.defense=5
 
 
     def set_texture(self,surface):
@@ -409,8 +505,11 @@ class Enemy:
     def collider_chek(self,obj):
         if pg.Rect.colliderect(self.rc,obj.rc) and obj.player:
             get_damage=obj.get_damage()
-            self.hp-=get_damage
-            get_damage=0
+            dmg=get_damage-get_damage*self.defense/100
+            if dmg<0:
+                dmg=0
+            self.hp-=dmg
+            dmg=0
             #self.texture=pg.transform.
 
     def set_x(self, x):
@@ -419,7 +518,6 @@ class Enemy:
     def set_y(self, y):
         self.x = y
 
-    
     def init_(self, scr):
         if self.live:
             #print(len(self.bulets))
@@ -451,13 +549,14 @@ class Enemy:
 
 class Label:
 
-    def __init__(self, x, y, weight, height, text="Label1", img_path=None):
+    def __init__(self, x, y, weight, height, text="Label1",formenu=False, img_path=None):
         self.x = x
         self.y = y
         self.weight = weight
         self.height = height
         self.text = text
         self.img_path = img_path
+        self.forMenu=formenu
         if img_path != None:
             self.zone = pg.image.load(self.img_path)
             self.zone = pg.transform.scale(
@@ -491,52 +590,63 @@ class Label:
 
 class Button:
 
-    def __init__(self, x: int, y: int, width: int, height: int, images_pathes=(), text=None, function=None, isPressed=False):
+    def __init__(self, x: int, y: int, width: int, height: int, textures=(), text=None, function=None, isPressed=False,formenu=False):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.text = text
-        self.images_pathes = images_pathes
         self.function = function
         self.isPressed = isPressed
-        if self.images_pathes != ():
-            self.img1 = pg.image.load(self.images_pathes[0])
+        self.text="Button"
+        self.isdraw=True
+        self.forMenu=formenu
+        if textures!=():
+            self.img1=textures[0]
             self.img1 = pg.transform.scale(
                 self.img1, (self.width, self.height))
-            self.img1.set_colorkey((255, 255, 255))
-            self.img1_rect = self.img1.get_rect(topleft=(self.x, self.y))
-
-            self.img2 = pg.image.load(self.images_pathes[1])
+            self.img2=textures[1]
             self.img2 = pg.transform.scale(
                 self.img2, (self.width, self.height))
-            self.img2.set_colorkey((255, 255, 255))
+            self.withtexture=True
         else:
-            self.zone = pg.Surface((self.x, self.y))
-            self.zone = pg.transform.scale(
-                self.zone, (self.width, self.height))
-            self.zone_rect = self.zone.get_rect(topleft=(self.x, self.y))
+            self.img1=pg.Surface((width,height))
+            self.img1 = pg.transform.scale(self.img1, (self.width, self.height))
+            self.img2=pg.Surface((width,height))
+            self.img2 = pg.transform.scale(self.img2, (self.width, self.height))
+            self.withtexture=False
+        self.set_parms()
 
     def show(self, scr):
-        self.curret_img = self.img2 if self.isPressed else self.img1
-        scr.blit(self.curret_img, self.img1_rect.topleft)
-
-    def show_rect(self, scr, size=15, font="Comic Sans MS", aligin=(0, 0), color=(0, 0, 0), color_backgroud=(255, 255, 255)):
-        my_font = pg.font.SysFont(font, size)
-        text_rnd = my_font.render(self.text, False, color)
-        self.zone.fill(color_backgroud)
-        self.zone.blit(text_rnd, self.zone.get_rect(topleft=aligin))
-        scr.blit(self.zone, self.zone_rect)
+        if self.isdraw:
+            if self.withtexture:
+                if self.isPressed:self.curret_img = self.img2
+                else: self.curret_img = self.img1
+            else:
+                if self.isPressed:self.curret_img = self.img2
+                else: self.curret_img = self.img1
+                self.curret_img.blit(self.text_rnd, self.curret_img.get_rect(topleft=self.aligin))
+            scr.blit(self.curret_img,(self.x,self.y))
+            
+            
+    def set_parms(self,size=15, font="Comic Sans MS", aligin=(0, 0), color=(0, 0, 0), color_backgroud=((255, 255, 255),(0,0,0))):
+        self.size=size
+        self.font=font
+        self.aligin=aligin
+        self.color=color
+        self.color_backgroud=color_backgroud
+        my_font = pg.font.SysFont(self.font, self.size)
+        self.text_rnd = my_font.render(self.text, False, self.color)
+        self.img1.fill(self.color_backgroud[0])
+        self.img2.fill(self.color_backgroud[1])
 
     def changing(self, mouse_pos):
-        self.isPressed = self.img1_rect.collidepoint(mouse_pos)
+        if self.isdraw:
+            self.isPressed = pg.rect.Rect(self.x,self.y,self.width,self.height).collidepoint(mouse_pos)
 
     def do_func(self, event):
-        if self.function != None and self.isPressed and event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+        if self.function != None and self.isPressed and event.type == pg.MOUSEBUTTONDOWN and event.button == 1 and self.isdraw:
             self.function()
-
-    def changing_rect(self, mouse_pos):
-        self.isPressed = self.zone_rect.collidepoint(mouse_pos)
 
     def get_type(self):
         return "button"
@@ -561,6 +671,7 @@ class Engine:
         self.methods=(False,False)
         self.fps_m1_koef=0.8
         self.lim_m1_koef=100
+        self.menu=True
         pg.display.set_caption(self.caption)
         
     def set_res(self,res=(640,480)):
@@ -606,52 +717,77 @@ class Engine:
     def set_title(self,title):
         self.caption=title
         pg.display.set_caption(self.caption)   
-        
-    def optimithastion(self):
-        #method 1
-        if self.methods[0]:
-            ki=0
-            while ki<self.lim_m1_koef and self.fps_now<self.fps*self.fps_m1_koef:
-                try:
-                    del self.objects["enemys"][ki]
-                except:
-                    break
-                ki+=1
-                       
+           
     def updater_color(self,color=(100, 111, 87)):
         self.upd=color
     
-    def run(self,showColision=False,colision=True):
+    def startMenu(self):
+        self.menu=True
+    
+    def startGame(self):
+        self.menu=False
+    
+    def gameScene(self,showColision):
+        for img in self.objects["images"]:
+            if not img.forMenu: img.init_(self.display)
+        for enemy in self.objects["enemys"]:
+            enemy.init_(self.display) 
+            for bul in self.objects["bullets"]:
+                enemy.collider_chek(bul)
+            if showColision: enemy.draw_rect(self.display)
+        for player in self.objects["players"]:
+            player.init_(self.display)
+            for bul in self.objects["bullets"]:
+                player.collider_chek(bul)
+            if showColision: player.draw_rect(self.display)
+        for wall in self.objects["walls"]:
+            wall.init_(self.display)
+            pl = self.objects["players"][0]
+            pl.chek_colis(wall.rc)
+        for bullet in self.objects["bullets"]:
+            bullet.init_(self.display)
+        for label in self.objects["lables"]:
+            if not label.forMenu: label.show(self.display)
+        for button in self.objects["buttons"]:
+                if not button.forMenu:
+                    button.show(self.display)
+        for event in pg.event.get():                
+            for button in self.objects["buttons"]:
+                if not button.forMenu:
+                    button.changing(pg.mouse.get_pos())
+                    button.do_func(event)
+            if event.type == pg.QUIT:
+                sys.exit()
+    
+    def changeScene(self):
+        self.menu = False if self.menu else True
+    
+    def menuScene(self):
+        for img in self.objects["images"]:
+            if img.forMenu: img.init_(self.display)
+        for label in self.objects["lables"]:
+            if label.forMenu: label.show(self.display)
+        for button in self.objects["buttons"]:
+                if button.forMenu:
+                    button.show(self.display)
+        for event in pg.event.get():                
+            for button in self.objects["buttons"]:
+                if button.forMenu:
+                    button.changing(pg.mouse.get_pos())
+                    button.do_func(event)
+            if event.type == pg.QUIT:
+                sys.exit()
+            
+    def run(self,showColision=False):
         while self.runing:
             pg.draw.rect(self.display,self.upd,pg.Rect(0,0,self.w,self.h))
             self.fps_now=self.frame.get_fps()
-            for img in self.objects["images"]:
-                img.init_(self.display)
-            for enemy in self.objects["enemys"]:
-                enemy.init_(self.display) 
-                for bul in self.objects["bullets"]:
-                    enemy.collider_chek(bul)
-                if showColision: enemy.draw_rect(self.display)
-            for player in self.objects["players"]:
-                player.init_(self.display)
-                for bul in self.objects["bullets"]:
-                    player.collider_chek(bul)
-                if showColision: player.draw_rect(self.display)
-            for wall in self.objects["walls"]:
-                wall.init_(self.display)
-                pl = self.objects["players"][0]
-                pl.chek_colis(wall.rc)
-            for label in self.objects["lables"]:
-                label.show(self.display)
-            for bullet in self.objects["bullets"]:
-                bullet.init_(self.display)
-            for event in pg.event.get():                
-                for button in self.objects["buttons"]:
-                    button.show_rect(self.display)
-                    button.changing_rect(pg.mouse.get_pos())
-                    button.do_func(event)
-                if event.type == pg.QUIT:
-                    sys.exit()
+            
+            if self.menu:
+                self.menuScene()
+            else:
+                self.gameScene(showColision)
+            
             self.customFunctions()
             self.frame.tick(self.fps)
             pg.display.flip()

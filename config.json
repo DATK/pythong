@@ -1,11 +1,11 @@
 {
-  "kolvo_enemys": 25,
+  "kolvo_enemys": 12,
   "kolvo_bullets_player": 60,
-  "kolvo_bullets_enemys": 3,
+  "kolvo_bullets_enemys": 10,
   "otdacha_enemy": 25,
   "speed_enemys": 1,
   "speed_player": 10,
   "player_speed_shoot": [45, 150],
   "enemys_speed_shoot": [3, 170],
-  "FPS_MAX": 60
+  "FPS_MAX": 600
 }
