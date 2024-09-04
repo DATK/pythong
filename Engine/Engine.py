@@ -174,7 +174,7 @@ class Weapon:
 
 class Bullet:
     
-    def __init__(self,texure_bullet=None,width=5,height=5,damage=5,speed=3,player=False):
+    def __init__(self,texure_bullet=None,width=5,height=5,damage=5,speed=3,player=False,granis=(0,0,1280,720)):
         if texure_bullet==None:
             self.texure_bullet=pg.Surface((width,height))
             self.texure_bullet.fill((255,0,0))
@@ -189,7 +189,7 @@ class Bullet:
         self.speed=speed
         self.isdraw=False
         self.player=player
-        self.granis=(0,0,1280,720)
+        self.granis=granis
         self.permanent_spread=(-1,1)
 
     def set_start_cords(self,x,y):
@@ -537,7 +537,7 @@ class Enemy:
                 self.x=self.stopX
             self.count+=self.speed_shoot
         else:
-            del self.rc
+            self.rc=pg.Rect(-1000,-1000,self.texture.get_width(),self.texture.get_height())
         
         
     def draw_rect(self,scr):
@@ -697,6 +697,11 @@ class Engine:
         else:
             pass
     
+    def set_fuclscreen(self):
+        self.display=pg.display.set_mode((0,0),pg.FULLSCREEN)
+        self.w,self.h=(self.display.get_width(),self.display.get_height())
+        return (self.w,self.h)
+        
     def set_icon(self,img_path):
         pg.display.set_icon(pg.image.load(img_path))
         
@@ -708,6 +713,9 @@ class Engine:
         
     def set_work_func(self,name_func,work):
         self.cstfnc[name_func]["work"]=work
+        
+    def change_work_func(self,name_func):
+        self.cstfnc[name_func]["work"]=False if self.cstfnc[name_func]["work"] else True
         
     def customFunctions(self):
         for funcs in self.cstfnc:
@@ -790,7 +798,7 @@ class Engine:
             
             self.customFunctions()
             self.frame.tick(self.fps)
-            pg.display.flip()
+            pg.display.update()
             
             
             

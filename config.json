@@ -7,5 +7,5 @@
   "speed_player": 10,
   "player_speed_shoot": [45, 150],
   "enemys_speed_shoot": [3, 170],
-  "FPS_MAX": 600
+  "FPS_MAX": 60
 }
