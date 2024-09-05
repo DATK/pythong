@@ -56,9 +56,9 @@ def fpsLock():
     else:
         eng.set_frame(60)
     if eng.fps==60:
-        FpsLock60.set_parms(40,aligin=(40,20),color_backgroud=ButtnOn)
+        FpsLock60.set_parms(40,aligin=(20,20),color_backgroud=ButtnOn)
     else:
-        FpsLock60.set_parms(40,aligin=(40,20),color_backgroud=ButtnOff)            
+        FpsLock60.set_parms(40,aligin=(20,20),color_backgroud=ButtnOff)            
         
 ButtnOn=((255,255,255),(0,200,0))
 ButtnOff=((255,255,255),(100,0,0))
