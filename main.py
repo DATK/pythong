@@ -59,7 +59,7 @@ def fpsLock():
         FpsLock60.set_parms(40,aligin=(20,20),color_backgroud=ButtnOn)
     else:
         FpsLock60.set_parms(40,aligin=(20,20),color_backgroud=ButtnOff)            
-        
+       
 ButtnOn=((255,255,255),(0,200,0))
 ButtnOff=((255,255,255),(100,0,0))
 startButton=Button(WIDTH*0.4,HEIGH*0.2,200,100,function=lambda: eng.changeScene(),formenu=True)
@@ -179,7 +179,7 @@ def debug():
     bulets_rightnow.show(eng.display,text=f"bullets: {buls}",isbackground=False)
 
 
-def gen_box():
+def gen_box(WIDTH,HEIGH):
     if boxHP.hp<=0 and not boxHP.isdraw:
         boxHP.set_pos((r.randint(500,WIDTH-120),r.randint(130,HEIGH-120)))
         bufHP.hp=r.randint(25,300)
@@ -200,32 +200,29 @@ def gen_box():
         if r.randint(-2000,200000)>199930:
             boxWeapon.hp=r.randint(150,300)
             boxWeapon.isdraw=True
+         
         
-  
-  
-[eng.add_objects(i) for i in walls]
-eng.add_objects(player)
-eng.add_objects(phone)
-eng.add_objects(phone2)
-eng.add_objects(phone_menu)
-eng.add_objects(boxHP)
-eng.add_objects(boxWeapon)
-eng.add_objects(boxSheild)
-eng.add_objects(startButton)
-eng.add_objects(stopButton)
-eng.add_objects(debugButton)
-eng.add_objects(exitButon)
-eng.add_objects(setingsButton)
-eng.add_objects(FpsLock60)
-eng.add_objects(settingsTwo)
-eng.add_objects(settingsThree)
-eng.add_objects(settingsBackToMenu)
-[eng.add_objects(i) for i in enemys]
+def load_objects():  
+    [eng.add_objects(i) for i in walls]
+    eng.add_objects(player)
+    eng.add_objects(phone)
+    eng.add_objects(phone2)
+    eng.add_objects(phone_menu)
+    eng.add_objects(boxHP)
+    eng.add_objects(boxWeapon)
+    eng.add_objects(boxSheild)
+    eng.add_objects(startButton)
+    eng.add_objects(stopButton)
+    eng.add_objects(debugButton)
+    eng.add_objects(exitButon)
+    eng.add_objects(setingsButton)
+    eng.add_objects(FpsLock60)
+    eng.add_objects(settingsTwo)
+    eng.add_objects(settingsThree)
+    eng.add_objects(settingsBackToMenu)
+    [eng.add_objects(i) for i in enemys]    
+    eng.addCustomFunc("debug",debug,False)
+    eng.addCustomFunc("boxesGen",lambda: gen_box(WIDTH,HEIGH),True)
 
-
-        
-eng.addCustomFunc("debug",debug,False)
-eng.addCustomFunc("boxesGen",gen_box,True)
-
-
+load_objects()
 eng.run(showColision=0)

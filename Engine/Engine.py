@@ -765,8 +765,9 @@ class Engine:
         for obj in self.objects:
             self.objects[obj]=[]
     
-    def resolution_update(self):
-        print(self.display.get_size)
+    def get_size_window(self):
+        return self.display.get_size()
+            
     
     def gameScene(self,showColision):
         for img in self.objects["images"]:
@@ -830,7 +831,6 @@ class Engine:
             else:
                 self.gameScene(showColision)
                 
-            self.resolution_update()
             self.customFunctions()
             self.frame.tick(self.fps)
             pg.display.update()
