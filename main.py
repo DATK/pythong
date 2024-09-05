@@ -25,9 +25,9 @@ enemy_texures=[img_loader.load("enemy1.png",colorkey=[True,(255,255,255)]),img_l
 bullet_texture=img_loader.load("bullet.png",colorkey=[True,(255,255,255)])
 bullet_texture_enemy=img_loader.load("bullet_enemy1.png",colorkey=[True,(255,255,255)])
 
-phone=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),isphone=True,speed=-1.7,width=WIDTH,hieght=HEIGH)
-phone2=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),isphone=True,pos=(WIDTH,0),speed=-1.7,width=WIDTH,hieght=HEIGH)
-
+phone=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=True,speed=-1.7,width=WIDTH,hieght=HEIGH)
+phone2=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=True,pos=(WIDTH,0),speed=-1.7,width=WIDTH,hieght=HEIGH)
+phone_menu=Image(img_loader.load("phone.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=False,pos=(0,0),width=WIDTH,hieght=HEIGH,formenu=True)
 
 def settings():
     if setingsButton.isdraw:
@@ -178,8 +178,6 @@ def debug():
     enemyss.show(eng.display,text=f"enemys: {len(eng.objects['enemys'])}",isbackground=False)
     buls=len([i for i in eng.objects["bullets"] if i.isdraw])
     bulets_rightnow.show(eng.display,text=f"bullets: {buls}",isbackground=False)
-    print(f"phone1 {phone.x} phone2 {phone2.x}")
-
 
 
 def gen_box():
@@ -209,6 +207,7 @@ def gen_box():
 eng.add_objects(player)
 eng.add_objects(phone)
 eng.add_objects(phone2)
+eng.add_objects(phone_menu)
 eng.add_objects(boxHP)
 eng.add_objects(boxWeapon)
 eng.add_objects(boxSheild)

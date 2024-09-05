@@ -35,10 +35,10 @@ class ImageLoader:
     
 class Image:
     
-    def __init__(self,image,pos=(0,0),isphone=False,formenu=False,speed=-5,width=1280,hieght=800):
+    def __init__(self,image,pos=(0,0),dynamic=False,formenu=False,speed=-5,width=1280,hieght=800):
         self.image=pg.transform.scale(image,(width+3,hieght))
         self.x,self.y=pos
-        self.isphone=isphone
+        self.dynamic=dynamic
         self.speedx=speed
         self.speedy=0
         self.width=width
@@ -60,7 +60,7 @@ class Image:
             scr.blit(self.image,(self.x,self.y))
     
     def move(self):
-        if self.isphone:
+        if self.dynamic:
             width=self.width
             if self.x<=0-width:
                 self.x=self.width
