@@ -667,6 +667,8 @@ class Button:
                 self.curret_img.blit(self.text_rnd, self.curret_img.get_rect(topleft=self.aligin))
             scr.blit(self.curret_img,(self.x,self.y))
             self.showed=True
+        else:
+            self.showed=False
             
             
     def set_parms(self,size=15, font="Comic Sans MS", aligin=(0, 0), color=(0, 0, 0), color_backgroud=((255, 255, 255),(0,0,0))):
