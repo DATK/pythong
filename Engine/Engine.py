@@ -32,6 +32,9 @@ class ImageLoader:
         except:
             image=None
         return image
+
+
+
     
 class Image:
     
@@ -303,6 +306,35 @@ class Box:
     def draw_rect(self,scr):
         if self.isdraw: pg.draw.rect(scr,(0,255,0),self.rc)
 
+class Scene:
+    
+    def __init__(self):
+        self.objects = {"buttons": [], "lables": [],
+                        "enemys": [], "camera": [], "figures": [], "players": [],"walls":[],"images":[],"bullets":[]}
+
+         
+    def add_objects(self, obj):
+        typeob = obj.get_type()
+        if typeob == "button":
+            self.objects["buttons"].append(obj)
+        elif typeob == "label":
+            self.objects["lables"].append(obj)
+        elif typeob == "enemy":
+            self.objects["enemys"].append(obj)
+        elif typeob == "bullet":
+            self.objects["bullets"].append(obj)
+        elif typeob == "player":
+            self.objects["players"].append(obj)
+        elif typeob == "wall":
+            self.objects["walls"].append(obj)
+        elif typeob == "image":
+            self.objects["images"].append(obj)
+        else:
+            pass
+    
+    def get(self):
+        return self.objects
+    
 class Player:
     
     def __init__(self,start_xy=(),width=10,height=10,texture=None,hp=100):
@@ -606,6 +638,7 @@ class Button:
         self.isPressed = isPressed
         self.text="Button"
         self.isdraw=True
+        self.showed=False
         self.forMenu=formenu
         if textures!=():
             self.img1=textures[0]
@@ -633,6 +666,7 @@ class Button:
                 else: self.curret_img = self.img1
                 self.curret_img.blit(self.text_rnd, self.curret_img.get_rect(topleft=self.aligin))
             scr.blit(self.curret_img,(self.x,self.y))
+            self.showed=True
             
             
     def set_parms(self,size=15, font="Comic Sans MS", aligin=(0, 0), color=(0, 0, 0), color_backgroud=((255, 255, 255),(0,0,0))):
@@ -651,7 +685,7 @@ class Button:
             self.isPressed = pg.rect.Rect(self.x,self.y,self.width,self.height).collidepoint(mouse_pos)
 
     def do_func(self, event):
-        if self.function != None and self.isPressed and event.type == pg.MOUSEBUTTONDOWN and event.button == 1 and self.isdraw:
+        if self.function != None and self.isPressed and event.type == pg.MOUSEBUTTONUP and self.isdraw and self.showed:
             self.function()
 
     def get_type(self):
@@ -741,6 +775,19 @@ class Engine:
     def startGame(self):
         self.menu=False
     
+    def loadScene(self,scene):
+        self.objects=scene.get()
+    
+    def clear_objects(self):
+        self.objects["enemys"]=[]
+        self.objects["players"]=[]
+        self.objects["walls"]=[]
+        self.objects["bullets"]=[]
+    
+    def clearScene(self):
+        self.objects = {"buttons": [], "lables": [],
+                        "enemys": [], "camera": [], "figures": [], "players": [],"walls":[],"images":[],"bullets":[]}
+    
     def gameScene(self,showColision):
         for img in self.objects["images"]:
             if not img.forMenu: img.init_(self.display)
@@ -792,7 +839,7 @@ class Engine:
                     button.do_func(event)
             if event.type == pg.QUIT:
                 sys.exit()
-            
+    
     def run(self,showColision=False):
         while self.runing:
             pg.draw.rect(self.display,self.upd,pg.Rect(0,0,self.w,self.h))

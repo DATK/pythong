@@ -84,8 +84,8 @@ FpsLock60.isdraw=False
 FpsLock60.set_parms(40,aligin=(20,20),color_backgroud=ButtnOn)
 
 
-settingsTwo=Button(WIDTH*0.4,HEIGH*0.40,200,100,function=None,formenu=True)
-settingsTwo.text="Недоступно"
+settingsTwo=Button(WIDTH*0.4,HEIGH*0.40,200,100,function=eng.clear_objects,formenu=True)
+settingsTwo.text="Удалить"
 settingsTwo.isdraw=False
 settingsTwo.set_parms(40,aligin=(1,20),color_backgroud=ButtnOff)
 
@@ -164,7 +164,6 @@ eng.set_frame(FPS)
 
 
 player.get_weapon(pistol)
-
 player.speed=speed_player
 
 boxHP.set_texture(box_texture_hp)
