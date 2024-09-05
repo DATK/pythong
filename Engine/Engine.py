@@ -330,6 +330,8 @@ class Player:
         self.has_weapon=False
         self.defense=99
         self.defense_koef=0.4
+        self.DisplayRes=()
+        self.forandroid=False
 
 
     def get_weapon(self,weapon):
@@ -337,10 +339,36 @@ class Player:
         self.has_weapon=True
         self.speed_shoot,self.max_shootSpeed=weapon.shoot_parms[0],weapon.shoot_parms[1]
 
+    def set_res(self,res):
+        self.DisplayRes=res
+    
     def set_texture(self,surface):
         self.texture=pg.transform.scale(surface,size=(self.width,self.height))
         self.rc=self.texture.get_rect()
     
+    
+    def moveing_android(self):
+        pressed=pg.mouse.get_pressed()
+        pos=pg.mouse.get_pos()
+        self.vector=[0,0]
+        if pressed:
+            if pos[0]<self.DisplayRes[0]*0.4:
+                self.vector[0]-=1
+            if pos[0]>self.DisplayRes[0]*0.6:
+                self.vector[0]+=1
+            if pos[1] > 0 and pos[1]<self.DisplayRes[1]*0.4:
+                self.vector[1]-=1
+            if pos[1]>self.DisplayRes[1]*0.6:
+                self.vector[1]+=1
+        if self.has_weapon:
+            if self.count>=self.max_shootSpeed:
+                self.weapon.shoot(self.x+self.width,self.y+self.height//2)
+                self.x-=self.weapon.kickback
+                self.count=0
+        self.count+=self.speed_shoot      
+        self.x+=self.vector[0]*self.speedx
+        self.y+=self.vector[1]*self.speedy
+        
     def moving_pc(self):
         self.vector=[0,0]
         keys = pg.key.get_pressed()
@@ -362,7 +390,7 @@ class Player:
         self.y+=self.vector[1]*self.speedy
               
     def init_(self,scr):
-        self.moving_pc()
+        self.moveing_android() if self.forandroid else self.moving_pc()
         if self.defense<0:
                 self.defense=0
         if self.defense>125:

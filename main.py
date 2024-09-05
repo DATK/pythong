@@ -25,9 +25,9 @@ enemy_texures=[img_loader.load("enemy1.png",colorkey=[True,(255,255,255)]),img_l
 bullet_texture=img_loader.load("bullet.png",colorkey=[True,(255,255,255)])
 bullet_texture_enemy=img_loader.load("bullet_enemy1.png",colorkey=[True,(255,255,255)])
 
-phone=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=True,speed=-1.7,width=WIDTH,hieght=HEIGH)
-phone2=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=True,pos=(WIDTH,0),speed=-1.7,width=WIDTH,hieght=HEIGH)
-phone_menu=Image(img_loader.load("phone.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=False,pos=(0,0),width=WIDTH,hieght=HEIGH,formenu=True)
+phone=Image(img_loader.load("phone.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=True,speed=-1.7,width=WIDTH,hieght=HEIGH)
+phone2=Image(img_loader.load("phone.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=True,pos=(WIDTH,0),speed=-1.7,width=WIDTH,hieght=HEIGH)
+phone_menu=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=False,pos=(0,0),width=WIDTH,hieght=HEIGH,formenu=True)
 
 def settings():
     if setingsButton.isdraw:
@@ -117,7 +117,7 @@ walls=[Wall((-1,0),1,HEIGH),
     Wall((0,HEIGH),WIDTH,1),
     ]
 
-enemys=[Enemy((WIDTH-230,r.randint(100,700)),
+enemys=[Enemy((WIDTH-230,r.randint(100,HEIGH-150)),
             140,110,r.choice(enemy_texures),125,-100) for i in range(kolvo_enemys)]
 
 
@@ -165,6 +165,8 @@ eng.set_frame(FPS)
 
 player.get_weapon(pistol)
 player.speed=speed_player
+player.set_res((WIDTH,HEIGH))
+player.forandroid=True
 
 boxHP.set_texture(box_texture_hp)
 boxSheild.set_texture(box_texture_shield)
@@ -179,7 +181,7 @@ def debug():
     bulets_rightnow.show(eng.display,text=f"bullets: {buls}",isbackground=False)
 
 
-def gen_box(WIDTH,HEIGH):
+def gen_box():
     if boxHP.hp<=0 and not boxHP.isdraw:
         boxHP.set_pos((r.randint(500,WIDTH-120),r.randint(130,HEIGH-120)))
         bufHP.hp=r.randint(25,300)
@@ -222,7 +224,7 @@ def load_objects():
     eng.add_objects(settingsBackToMenu)
     [eng.add_objects(i) for i in enemys]    
     eng.addCustomFunc("debug",debug,False)
-    eng.addCustomFunc("boxesGen",lambda: gen_box(WIDTH,HEIGH),True)
+    eng.addCustomFunc("boxesGen",gen_box,True)
 
 load_objects()
 eng.run(showColision=0)
