@@ -202,6 +202,7 @@ def gen_box():
             boxWeapon.isdraw=True
         
   
+  
 [eng.add_objects(i) for i in walls]
 eng.add_objects(player)
 eng.add_objects(phone)

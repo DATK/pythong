@@ -306,35 +306,7 @@ class Box:
     def draw_rect(self,scr):
         if self.isdraw: pg.draw.rect(scr,(0,255,0),self.rc)
 
-class Scene:
-    
-    def __init__(self):
-        self.objects = {"buttons": [], "lables": [],
-                        "enemys": [], "camera": [], "figures": [], "players": [],"walls":[],"images":[],"bullets":[]}
 
-         
-    def add_objects(self, obj):
-        typeob = obj.get_type()
-        if typeob == "button":
-            self.objects["buttons"].append(obj)
-        elif typeob == "label":
-            self.objects["lables"].append(obj)
-        elif typeob == "enemy":
-            self.objects["enemys"].append(obj)
-        elif typeob == "bullet":
-            self.objects["bullets"].append(obj)
-        elif typeob == "player":
-            self.objects["players"].append(obj)
-        elif typeob == "wall":
-            self.objects["walls"].append(obj)
-        elif typeob == "image":
-            self.objects["images"].append(obj)
-        else:
-            pass
-    
-    def get(self):
-        return self.objects
-    
 class Player:
     
     def __init__(self,start_xy=(),width=10,height=10,texture=None,hp=100):
@@ -786,9 +758,12 @@ class Engine:
         self.objects["walls"]=[]
         self.objects["bullets"]=[]
     
-    def clearScene(self):
-        self.objects = {"buttons": [], "lables": [],
-                        "enemys": [], "camera": [], "figures": [], "players": [],"walls":[],"images":[],"bullets":[]}
+    def clear_images(self):
+        self.objects["images"]=[]
+    
+    def clear_all(self):
+        for obj in self.objects:
+            self.objects[obj]=[]
     
     def gameScene(self,showColision):
         for img in self.objects["images"]:
