@@ -198,7 +198,7 @@ def gen_box():
     if boxWeapon.hp<=0 and not boxWeapon.isdraw:
         boxWeapon.set_pos((r.randint(500,WIDTH-120),r.randint(130,HEIGH-120)))
         boxWeapon.set_obj(r.choice(weapons),type="Weapon")
-        if r.randint(-2000,200000)>199000:
+        if r.randint(-2000,200000)>199930:
             boxWeapon.hp=r.randint(150,300)
             boxWeapon.isdraw=True
         
