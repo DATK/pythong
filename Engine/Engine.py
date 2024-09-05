@@ -334,6 +334,7 @@ class Player:
         self.forandroid=False
 
 
+
     def get_weapon(self,weapon):
         self.weapon=weapon
         self.has_weapon=True
@@ -341,6 +342,10 @@ class Player:
 
     def set_res(self,res):
         self.DisplayRes=res
+        self.leftBut=pg.Rect(0,res[1]*0.7,res[0]*0.2,res[1]*0.2)
+        self.rightBut=pg.Rect(res[0]*0.2+15,res[1]*0.7,res[0]*0.2,res[1]*0.2)
+        self.upBut=pg.Rect(res[0]*0.8,res[1]*0.5,res[0]*0.14,res[1]*0.17)
+        self.downBut=pg.Rect(res[0]*0.8,res[1]*0.7,res[0]*0.14,res[1]*0.17)
     
     def set_texture(self,surface):
         self.texture=pg.transform.scale(surface,size=(self.width,self.height))
@@ -351,15 +356,16 @@ class Player:
         pressed=pg.mouse.get_pressed()
         pos=pg.mouse.get_pos()
         self.vector=[0,0]
-        if pressed:
-            if pos[0]<self.DisplayRes[0]*0.4:
+        if pressed[0]:
+            if self.leftBut.collidepoint(pos):
                 self.vector[0]-=1
-            if pos[0]>self.DisplayRes[0]*0.6:
+            if self.rightBut.collidepoint(pos):
                 self.vector[0]+=1
-            if pos[1] > 0 and pos[1]<self.DisplayRes[1]*0.4:
+            if self.upBut.collidepoint(pos):
                 self.vector[1]-=1
-            if pos[1]>self.DisplayRes[1]*0.6:
+            if self.downBut.collidepoint(pos):
                 self.vector[1]+=1
+                
         if self.has_weapon:
             if self.count>=self.max_shootSpeed:
                 self.weapon.shoot(self.x+self.width,self.y+self.height//2)
