@@ -152,7 +152,7 @@ boxWeapon.isdraw=False
 
 
 for enem in enemys:
-    pistol_enmy=Weapon(damage=2,vectorx=-1,shoot_parms=(10,150),start_spread=(-2,2),permanent_spread=(-6,6))
+    pistol_enmy=Weapon(damage=2,vectorx=-1,shoot_parms=(2,160),start_spread=(-2,2),permanent_spread=(-6,6))
     pistol_bullets_enemy=[Bullet(bullet_texture_enemy,30,21,1,r.randint(6,9),False,granis=(0,0,WIDTH,HEIGH)) for i in range(kolvo_bullets_enemys)]
     pistol_enmy.load_bullets(pistol_bullets_enemy,eng)
     enem.get_weapon(pistol_enmy)
