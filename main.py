@@ -11,6 +11,8 @@ speed_enemys=data['speed_enemys']
 speed_player=data['speed_player']
 FPS=data['FPS_MAX']
 
+
+
 eng = Engine()
 img_loader=ImageLoader() 
 player=Player((200,340),90,80)

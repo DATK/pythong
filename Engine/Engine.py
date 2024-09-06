@@ -344,8 +344,8 @@ class Player:
         self.DisplayRes=res
         self.leftBut=pg.Rect(0,res[1]*0.7,res[0]*0.2,res[1]*0.2)
         self.rightBut=pg.Rect(res[0]*0.2+15,res[1]*0.7,res[0]*0.2,res[1]*0.2)
-        self.upBut=pg.Rect(res[0]*0.8,res[1]*0.5,res[0]*0.14,res[1]*0.17)
-        self.downBut=pg.Rect(res[0]*0.8,res[1]*0.7,res[0]*0.14,res[1]*0.17)
+        self.upBut=pg.Rect(res[0]*0.8,res[1]*0.6,res[0]*0.14,res[1]*0.17)
+        self.downBut=pg.Rect(res[0]*0.8,res[1]*0.8,res[0]*0.14,res[1]*0.17)
     
     def set_texture(self,surface):
         self.texture=pg.transform.scale(surface,size=(self.width,self.height))
@@ -365,7 +365,7 @@ class Player:
                 self.vector[1]-=1
             if self.downBut.collidepoint(pos):
                 self.vector[1]+=1
-                
+            
         if self.has_weapon:
             if self.count>=self.max_shootSpeed:
                 self.weapon.shoot(self.x+self.width,self.y+self.height//2)
