@@ -1,5 +1,5 @@
 {
-  "kolvo_enemys": 100,
+  "kolvo_enemys": 5,
   "kolvo_bullets_enemys": 10,
   "speed_enemys": 1,
   "speed_player": 10,

@@ -15,12 +15,14 @@ FPS=data['FPS_MAX']
 
 eng = Engine()
 img_loader=ImageLoader() 
-player=Player((200,340),90,80)
+
 
 mainMenu=Scene()
 Game_play=Scene()
 
 WIDTH,HEIGH=eng.set_fuclscreen()
+
+player=Player((WIDTH*0.08,HEIGH*0.075),90,80)
 
 hero=img_loader.load("hero.png",colorkey=[True,(255,255,255)])
 box_texture_weapon=img_loader.load("weapon_box1.png")
@@ -68,6 +70,10 @@ def fpsLock():
 def change_scene(scene):
     eng.load_scene(scene)
     eng.change_work_func("boxesGen")
+    
+    
+# 6-10
+
 
 ButtnOn=((255,255,255),(0,200,0))
 ButtnOff=((255,255,255),(100,0,0))
@@ -128,7 +134,7 @@ walls=[Wall((-1,0),1,HEIGH),
     ]
 
 enemys=[Enemy((WIDTH-230,r.randint(100,HEIGH-150)),
-            140,110,r.choice(enemy_texures),125,-100) for i in range(kolvo_enemys)]
+            WIDTH*0.1,HEIGH*0.095,r.choice(enemy_texures),125,-100) for i in range(kolvo_enemys)]
 
 
 def pistol_traek(x):
@@ -184,7 +190,7 @@ boxWeapon.set_texture(box_texture_weapon)
 
 def debug():
     fps.show(eng.display,text=f"FPS - {int(eng.fps_now)}",isbackground=False)
-    cords.show(eng.display,text=f"xy({player.x} {player.y})",isbackground=False)
+    cords.show(eng.display,text=f"xy({int(player.x)} {int(player.y)})",isbackground=False)
     hp.show(eng.display,text=f"hp: {int(player.hp)}",isbackground=False)
     enemyss.show(eng.display,text=f"enemys: {len(eng.objects['enemys'])}",isbackground=False)
     buls=len([i for i in eng.objects["bullets"] if i.isdraw])

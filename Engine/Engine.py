@@ -530,7 +530,8 @@ class Enemy:
         self.stopX=stopX
         self.defense=5
 
-
+        
+    
     def set_texture(self,surface):
         self.texture=pg.transform.scale(surface,size=(self.width,self.height))
         self.rc=self.texture.get_rect()    
@@ -867,4 +868,3 @@ class Engine:
             
             
             
-
