@@ -1,4 +1,4 @@
-from Engine.Engine import Engine,Button,Label,ImageLoader,Image,Wall,Player,Bullet,Enemy,Weapon,Box,Buf
+from Engine.Engine import Engine,Button,Label,ImageLoader,Image,Wall,Player,Bullet,Enemy,Weapon,Box,Buf,Scene
 import random as r
 import json
 import sys
@@ -17,6 +17,9 @@ eng = Engine()
 img_loader=ImageLoader() 
 player=Player((200,340),90,80)
 
+mainMenu=Scene()
+Game_play=Scene()
+
 WIDTH,HEIGH=eng.set_fuclscreen()
 
 hero=img_loader.load("hero.png",colorkey=[True,(255,255,255)])
@@ -29,7 +32,7 @@ bullet_texture_enemy=img_loader.load("bullet_enemy1.png",colorkey=[True,(255,255
 
 phone=Image(img_loader.load("phone.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=True,speed=-1.7,width=WIDTH,hieght=HEIGH)
 phone2=Image(img_loader.load("phone.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=True,pos=(WIDTH,0),speed=-1.7,width=WIDTH,hieght=HEIGH)
-phone_menu=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=False,pos=(0,0),width=WIDTH,hieght=HEIGH,formenu=True)
+phone_menu=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=False,pos=(0,0),width=WIDTH,hieght=HEIGH)
 
 def settings():
     if setingsButton.isdraw:
@@ -61,47 +64,51 @@ def fpsLock():
         FpsLock60.set_parms(40,aligin=(20,20),color_backgroud=ButtnOn)
     else:
         FpsLock60.set_parms(40,aligin=(20,20),color_backgroud=ButtnOff)            
-       
+
+def change_scene(scene):
+    eng.load_scene(scene)
+    eng.change_work_func("boxesGen")
+
 ButtnOn=((255,255,255),(0,200,0))
 ButtnOff=((255,255,255),(100,0,0))
-startButton=Button(WIDTH*0.4,HEIGH*0.2,200,100,function=lambda: eng.changeScene(),formenu=True)
+startButton=Button(WIDTH*0.4,HEIGH*0.2,200,100,function=lambda: change_scene(Game_play))
 startButton.text="Играть"
 startButton.set_parms(40,aligin=(40,20),color_backgroud=((255,255,255),(150,150,150)))
 
-stopButton=Button(WIDTH-200,0,200,100,function=lambda: eng.changeScene(),formenu=False)
+stopButton=Button(WIDTH-200,0,200,100,function=lambda: change_scene(mainMenu))
 stopButton.text="В меню"
 stopButton.set_parms(40,aligin=(40,20),color_backgroud=((255,255,255),(150,150,150)))
 
-exitButon=Button(WIDTH*0.4,HEIGH*0.80,200,100,function=lambda: sys.exit(),formenu=True)
+exitButon=Button(WIDTH*0.4,HEIGH*0.80,200,100,function=lambda: sys.exit())
 exitButon.text="Выход"
 exitButon.set_parms(40,aligin=(40,20),color_backgroud=((255,255,255),(150,150,150)))
 
-debugButton=Button(WIDTH*0.4,HEIGH*0.60,200,100,function=lambda: eng.change_work_func("debug"),formenu=True)
+debugButton=Button(WIDTH*0.4,HEIGH*0.60,200,100,function=lambda: eng.change_work_func("debug"))
 debugButton.text="Дебаг"
 debugButton.set_parms(40,aligin=(40,20),color_backgroud=((255,255,255),(150,150,150)))
 
-FpsLock60=Button(WIDTH*0.4,HEIGH*0.2,200,100,function=fpsLock,formenu=True)
+FpsLock60=Button(WIDTH*0.4,HEIGH*0.2,200,100,function=fpsLock)
 FpsLock60.text="Лок в 60 фпс"
 FpsLock60.isdraw=False
 FpsLock60.set_parms(40,aligin=(20,20),color_backgroud=ButtnOn)
 
 
-settingsTwo=Button(WIDTH*0.4,HEIGH*0.40,200,100,function=eng.clear_objects,formenu=True)
+settingsTwo=Button(WIDTH*0.4,HEIGH*0.40,200,100,function=eng.clear_objects)
 settingsTwo.text="Удалить"
 settingsTwo.isdraw=False
 settingsTwo.set_parms(40,aligin=(1,20),color_backgroud=ButtnOff)
 
-settingsThree=Button(WIDTH*0.4,HEIGH*0.60,200,100,function=None,formenu=True)
+settingsThree=Button(WIDTH*0.4,HEIGH*0.60,200,100,function=None)
 settingsThree.text="Недоступно"
 settingsThree.isdraw=False
 settingsThree.set_parms(40,aligin=(1,20),color_backgroud=ButtnOff)
 
-settingsBackToMenu=Button(WIDTH*0.4,HEIGH*0.80,200,100,function=settings,formenu=True)
+settingsBackToMenu=Button(WIDTH*0.4,HEIGH*0.80,200,100,function=settings)
 settingsBackToMenu.text="Вернуться"
 settingsBackToMenu.isdraw=False
 settingsBackToMenu.set_parms(38,aligin=(2,20),color_backgroud=((255,255,255),(150,150,150)))
 
-setingsButton=Button(WIDTH*0.4,HEIGH*0.40,200,100,function=settings,formenu=True)
+setingsButton=Button(WIDTH*0.4,HEIGH*0.40,200,100,function=settings)
 setingsButton.text="Настройки"
 setingsButton.set_parms(38,aligin=(2,20),color_backgroud=((255,255,255),(150,150,150)))
 
@@ -112,6 +119,7 @@ cords=Label(130,0,320,40)
 hp=Label(500,0,320,40)
 enemyss=Label(700,0,200,40)
 bulets_rightnow=Label(900,0,250,40)
+all_enemys=Label(1150,0,250,40)
 
 walls=[Wall((-1,0),1,HEIGH),
     Wall((WIDTH,0),1,HEIGH),
@@ -136,10 +144,10 @@ automat_bullets=[Bullet(bullet_texture,12,5,3,r.randint(16,18),True,granis=(0,0,
 pulemet_bullets=[Bullet(bullet_texture,14,6,2,r.randint(21,24),True,granis=(0,0,WIDTH,HEIGH)) for i in range(45)]
 laser_bullets=[Bullet(bullet_texture,25,5,32,r.randint(16,18),True,granis=(0,0,WIDTH,HEIGH)) for i in range(3)]
 
-pistol.load_bullets(pistol_bullets,eng)
-automat.load_bullets(automat_bullets,eng)
-pulemet.load_bullets(pulemet_bullets,eng)
-laser.load_bullets(laser_bullets,eng)
+pistol.load_bullets(pistol_bullets,Game_play)
+automat.load_bullets(automat_bullets,Game_play)
+pulemet.load_bullets(pulemet_bullets,Game_play)
+laser.load_bullets(laser_bullets,Game_play)
 
 weapons=[automat,pulemet,laser]
 
@@ -156,7 +164,7 @@ boxWeapon.isdraw=False
 for enem in enemys:
     pistol_enmy=Weapon(damage=2,vectorx=-1,shoot_parms=(2,160),start_spread=(-2,2),permanent_spread=(-6,6))
     pistol_bullets_enemy=[Bullet(bullet_texture_enemy,30,21,1,r.randint(6,9),False,granis=(0,0,WIDTH,HEIGH)) for i in range(kolvo_bullets_enemys)]
-    pistol_enmy.load_bullets(pistol_bullets_enemy,eng)
+    pistol_enmy.load_bullets(pistol_bullets_enemy,Game_play)
     enem.get_weapon(pistol_enmy)
     enem.speed=speed_enemys
 
@@ -168,7 +176,7 @@ eng.set_frame(FPS)
 player.get_weapon(pistol)
 player.speed=speed_player
 player.set_res((WIDTH,HEIGH))
-player.forandroid=True
+player.forandroid=False
 
 boxHP.set_texture(box_texture_hp)
 boxSheild.set_texture(box_texture_shield)
@@ -181,7 +189,10 @@ def debug():
     enemyss.show(eng.display,text=f"enemys: {len(eng.objects['enemys'])}",isbackground=False)
     buls=len([i for i in eng.objects["bullets"] if i.isdraw])
     bulets_rightnow.show(eng.display,text=f"bullets: {buls}",isbackground=False)
-
+    c=0
+    for i in eng.objects:
+        c+=len(eng.objects[i])
+    all_enemys.show(eng.display,text=f"objects: {c}",isbackground=False)
 
 def gen_box():
     if boxHP.hp<=0 and not boxHP.isdraw:
@@ -205,28 +216,33 @@ def gen_box():
             boxWeapon.hp=r.randint(150,300)
             boxWeapon.isdraw=True
          
-        
-def load_objects():  
-    [eng.add_objects(i) for i in walls]
-    eng.add_objects(player)
-    eng.add_objects(phone)
-    eng.add_objects(phone2)
-    eng.add_objects(phone_menu)
-    eng.add_objects(boxHP)
-    eng.add_objects(boxWeapon)
-    eng.add_objects(boxSheild)
-    eng.add_objects(startButton)
-    eng.add_objects(stopButton)
-    eng.add_objects(debugButton)
-    eng.add_objects(exitButon)
-    eng.add_objects(setingsButton)
-    eng.add_objects(FpsLock60)
-    eng.add_objects(settingsTwo)
-    eng.add_objects(settingsThree)
-    eng.add_objects(settingsBackToMenu)
-    [eng.add_objects(i) for i in enemys]    
-    eng.addCustomFunc("debug",debug,False)
-    eng.addCustomFunc("boxesGen",gen_box,True)
+         
 
-load_objects()
+         
+ 
+[Game_play.add_objects(i) for i in walls]
+Game_play.add_objects(player)
+Game_play.add_objects(phone)
+Game_play.add_objects(phone2)
+mainMenu.add_objects(phone_menu)
+Game_play.add_objects(boxHP)
+Game_play.add_objects(boxWeapon)
+Game_play.add_objects(boxSheild)
+mainMenu.add_objects(startButton)
+Game_play.add_objects(stopButton)
+mainMenu.add_objects(debugButton)
+mainMenu.add_objects(exitButon)
+mainMenu.add_objects(setingsButton)
+mainMenu.add_objects(FpsLock60)
+mainMenu.add_objects(settingsTwo)
+mainMenu.add_objects(settingsThree)
+mainMenu.add_objects(settingsBackToMenu)
+[Game_play.add_objects(i) for i in enemys]    
+
+eng.addCustomFunc("debug",debug,False)
+eng.addCustomFunc("boxesGen",gen_box,False)
+
+
+eng.load_scene(mainMenu)
+
 eng.run(showColision=0)

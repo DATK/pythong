@@ -38,7 +38,7 @@ class ImageLoader:
     
 class Image:
     
-    def __init__(self,image,pos=(0,0),dynamic=False,formenu=False,speed=-5,width=1280,hieght=800):
+    def __init__(self,image,pos=(0,0),dynamic=False,speed=-5,width=1280,hieght=800):
         self.image=pg.transform.scale(image,(width+3,hieght))
         self.x,self.y=pos
         self.dynamic=dynamic
@@ -46,7 +46,6 @@ class Image:
         self.speedy=0
         self.width=width
         self.isdraw=True
-        self.forMenu=formenu
         self.hieght=hieght
 
 
@@ -593,14 +592,13 @@ class Enemy:
 
 class Label:
 
-    def __init__(self, x, y, weight, height, text="Label1",formenu=False, img_path=None):
+    def __init__(self, x, y, weight, height, text="Label1", img_path=None):
         self.x = x
         self.y = y
         self.weight = weight
         self.height = height
         self.text = text
         self.img_path = img_path
-        self.forMenu=formenu
         if img_path != None:
             self.zone = pg.image.load(self.img_path)
             self.zone = pg.transform.scale(
@@ -634,7 +632,7 @@ class Label:
 
 class Button:
 
-    def __init__(self, x: int, y: int, width: int, height: int, textures=(), text=None, function=None, isPressed=False,formenu=False):
+    def __init__(self, x: int, y: int, width: int, height: int, textures=(), text=None, function=None, isPressed=False):
         self.x = x
         self.y = y
         self.width = width
@@ -645,7 +643,6 @@ class Button:
         self.text="Button"
         self.isdraw=True
         self.showed=False
-        self.forMenu=formenu
         if textures!=():
             self.img1=textures[0]
             self.img1 = pg.transform.scale(
@@ -699,7 +696,34 @@ class Button:
     def get_type(self):
         return "button"
 
+class Scene:
+    
+    def __init__(self):
+         self.objects = {"buttons": [], "lables": [],
+                        "enemys": [], "camera": [], "figures": [], "players": [],"walls":[],"images":[],"bullets":[]}
 
+    def add_objects(self, obj):
+        typeob = obj.get_type()
+        if typeob == "button":
+            self.objects["buttons"].append(obj)
+        elif typeob == "label":
+            self.objects["lables"].append(obj)
+        elif typeob == "enemy":
+            self.objects["enemys"].append(obj)
+        elif typeob == "bullet":
+            self.objects["bullets"].append(obj)
+        elif typeob == "player":
+            self.objects["players"].append(obj)
+        elif typeob == "wall":
+            self.objects["walls"].append(obj)
+        elif typeob == "image":
+            self.objects["images"].append(obj)
+        else:
+            pass
+        
+    def get_scene(self):
+        return self.objects
+    
 class Engine:
 
     def __init__(self):
@@ -716,16 +740,17 @@ class Engine:
         self.cstfnc={}
         self.upd=(100, 111, 87)
         self.caption="My game"
-        self.methods=(False,False)
-        self.fps_m1_koef=0.8
-        self.lim_m1_koef=100
-        self.menu=True
         pg.display.set_caption(self.caption)
         
     def set_res(self,res=(640,480)):
         self.w,self.h=res
         self.display = pg.display.set_mode(res)
-        
+    
+    def load_scene(self,scene):
+        self.objects={"buttons": [], "lables": [],
+                        "enemys": [], "camera": [], "figures": [], "players": [],"walls":[],"images":[],"bullets":[]}
+        self.objects=scene.get_scene()
+    
     def add_objects(self, obj):
         typeob = obj.get_type()
         if typeob == "button":
@@ -777,12 +802,6 @@ class Engine:
     def updater_color(self,color=(100, 111, 87)):
         self.upd=color
     
-    def startMenu(self):
-        self.menu=True
-    
-    def startGame(self):
-        self.menu=False
-    
     def loadScene(self,scene):
         self.objects=scene.get()
     
@@ -805,7 +824,7 @@ class Engine:
     
     def gameScene(self,showColision):
         for img in self.objects["images"]:
-            if not img.forMenu: img.init_(self.display)
+            img.init_(self.display)
         for enemy in self.objects["enemys"]:
             enemy.init_(self.display) 
             for bul in self.objects["bullets"]:
@@ -824,46 +843,23 @@ class Engine:
             bullet.init_(self.display)
             if showColision: bullet.draw_rect(self.display)
         for label in self.objects["lables"]:
-            if not label.forMenu: label.show(self.display)
+            label.show(self.display)
         for button in self.objects["buttons"]:
-                if not button.forMenu:
-                    button.show(self.display)
+                button.show(self.display)
         for event in pg.event.get():                
             for button in self.objects["buttons"]:
-                if not button.forMenu:
-                    button.changing(pg.mouse.get_pos())
-                    button.do_func(event)
+                button.changing(pg.mouse.get_pos())
+                button.do_func(event)
             if event.type == pg.QUIT:
                 sys.exit()
     
-    def changeScene(self):
-        self.menu = False if self.menu else True
-    
-    def menuScene(self):
-        for img in self.objects["images"]:
-            if img.forMenu: img.init_(self.display)
-        for label in self.objects["lables"]:
-            if label.forMenu: label.show(self.display)
-        for button in self.objects["buttons"]:
-                if button.forMenu:
-                    button.show(self.display)
-        for event in pg.event.get():                
-            for button in self.objects["buttons"]:
-                if button.forMenu:
-                    button.changing(pg.mouse.get_pos())
-                    button.do_func(event)
-            if event.type == pg.QUIT:
-                sys.exit()
     
     def run(self,showColision=False):
         while self.runing:
             pg.draw.rect(self.display,self.upd,pg.Rect(0,0,self.w,self.h))
             self.fps_now=self.frame.get_fps()
             
-            if self.menu:
-                self.menuScene()
-            else:
-                self.gameScene(showColision)
+            self.gameScene(showColision)
                 
             self.customFunctions()
             self.frame.tick(self.fps)
