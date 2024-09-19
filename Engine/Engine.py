@@ -676,15 +676,16 @@ class Button:
             
             
     def set_parms(self,size=15, font="Comic Sans MS", aligin=(0, 0), color=(0, 0, 0), color_backgroud=((255, 255, 255),(0,0,0))):
-        self.size=size
-        self.font=font
-        self.aligin=aligin
-        self.color=color
-        self.color_backgroud=color_backgroud
-        my_font = pg.font.SysFont(self.font, self.size)
-        self.text_rnd = my_font.render(self.text, False, self.color)
-        self.img1.fill(self.color_backgroud[0])
-        self.img2.fill(self.color_backgroud[1])
+        if not self.withtexture:
+            self.size=size
+            self.font=font
+            self.aligin=aligin
+            self.color=color
+            self.color_backgroud=color_backgroud
+            my_font = pg.font.SysFont(self.font, self.size)
+            self.text_rnd = my_font.render(self.text, False, self.color)
+            self.img1.fill(self.color_backgroud[0])
+            self.img2.fill(self.color_backgroud[1])
 
     def changing(self, mouse_pos):
         if self.isdraw:

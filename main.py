@@ -16,6 +16,7 @@ FPS=data['FPS_MAX']
 eng = Engine()
 img_loader=ImageLoader() 
 
+ButtonX,ButtonY=180,70
 
 mainMenu=Scene()
 Game_play=Scene()
@@ -32,9 +33,21 @@ enemy_texures=[img_loader.load("enemy1.png",colorkey=[True,(255,255,255)]),img_l
 bullet_texture=img_loader.load("bullet.png",colorkey=[True,(255,255,255)])
 bullet_texture_enemy=img_loader.load("bullet_enemy1.png",colorkey=[True,(255,255,255)])
 
+playbutton1=img_loader.load("playbutton1.png")
+playbutton2=img_loader.load("playbutton2.png")
+
+settingsbutton1=img_loader.load("settingsbutton1.png")
+settingsbutton2=img_loader.load("settingsbutton2.png")
+
+menubutton1=img_loader.load("buttonmenu1.png")
+menubutton2=img_loader.load("buttonmenu2.png")
+
+exitbutton1=img_loader.load("exitbutton1.png")
+exitbutton2=img_loader.load("exitbutton1.png")
+
 phone=Image(img_loader.load("phone.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=True,speed=-1.7,width=WIDTH,hieght=HEIGH)
 phone2=Image(img_loader.load("phone.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=True,pos=(WIDTH,0),speed=-1.7,width=WIDTH,hieght=HEIGH)
-phone_menu=Image(img_loader.load("phone2.png",colorkey=[True,(0,0,0)],scale=(1,1)),dynamic=False,pos=(0,0),width=WIDTH,hieght=HEIGH)
+phone_menu=Image(img_loader.load("phone3.png",colorkey=[False,(0,0,0)],scale=(1,1)),dynamic=False,pos=(0,0),width=WIDTH,hieght=HEIGH)
 
 def settings():
     if setingsButton.isdraw:
@@ -77,44 +90,44 @@ def change_scene(scene):
 
 ButtnOn=((255,255,255),(0,200,0))
 ButtnOff=((255,255,255),(100,0,0))
-startButton=Button(WIDTH*0.4,HEIGH*0.2,200,100,function=lambda: change_scene(Game_play))
+startButton=Button(WIDTH*0.4,HEIGH*0.2,ButtonX,ButtonY,textures=(playbutton1,playbutton2),function=lambda: change_scene(Game_play))
 startButton.text="Играть"
 startButton.set_parms(40,aligin=(40,20),color_backgroud=((255,255,255),(150,150,150)))
 
-stopButton=Button(WIDTH-200,0,200,100,function=lambda: change_scene(mainMenu))
+stopButton=Button(WIDTH-200,0,ButtonX,ButtonY,textures=(menubutton1,menubutton2),function=lambda: change_scene(mainMenu))
 stopButton.text="В меню"
 stopButton.set_parms(40,aligin=(40,20),color_backgroud=((255,255,255),(150,150,150)))
 
-exitButon=Button(WIDTH*0.4,HEIGH*0.80,200,100,function=lambda: sys.exit())
+exitButon=Button(WIDTH*0.4,HEIGH*0.80,ButtonX,ButtonY,textures=(exitbutton1,exitbutton2),function=lambda: sys.exit())
 exitButon.text="Выход"
 exitButon.set_parms(40,aligin=(40,20),color_backgroud=((255,255,255),(150,150,150)))
 
-debugButton=Button(WIDTH*0.4,HEIGH*0.60,200,100,function=lambda: eng.change_work_func("debug"))
+debugButton=Button(WIDTH*0.4,HEIGH*0.60,ButtonX,ButtonY,function=lambda: eng.change_work_func("debug"))
 debugButton.text="Дебаг"
 debugButton.set_parms(40,aligin=(40,20),color_backgroud=((255,255,255),(150,150,150)))
 
-FpsLock60=Button(WIDTH*0.4,HEIGH*0.2,200,100,function=fpsLock)
+FpsLock60=Button(WIDTH*0.4,HEIGH*0.2,ButtonX,ButtonY,function=fpsLock)
 FpsLock60.text="Лок в 60 фпс"
 FpsLock60.isdraw=False
 FpsLock60.set_parms(40,aligin=(20,20),color_backgroud=ButtnOn)
 
 
-settingsTwo=Button(WIDTH*0.4,HEIGH*0.40,200,100,function=eng.clear_objects)
+settingsTwo=Button(WIDTH*0.4,HEIGH*0.40,ButtonX,ButtonY,function=eng.clear_objects)
 settingsTwo.text="Удалить"
 settingsTwo.isdraw=False
 settingsTwo.set_parms(40,aligin=(1,20),color_backgroud=ButtnOff)
 
-settingsThree=Button(WIDTH*0.4,HEIGH*0.60,200,100,function=None)
+settingsThree=Button(WIDTH*0.4,HEIGH*0.60,ButtonX,ButtonY,function=None)
 settingsThree.text="Недоступно"
 settingsThree.isdraw=False
 settingsThree.set_parms(40,aligin=(1,20),color_backgroud=ButtnOff)
 
-settingsBackToMenu=Button(WIDTH*0.4,HEIGH*0.80,200,100,function=settings)
+settingsBackToMenu=Button(WIDTH*0.4,HEIGH*0.80,ButtonX,ButtonY,textures=(menubutton1,menubutton2),function=settings)
 settingsBackToMenu.text="Вернуться"
 settingsBackToMenu.isdraw=False
 settingsBackToMenu.set_parms(38,aligin=(2,20),color_backgroud=((255,255,255),(150,150,150)))
 
-setingsButton=Button(WIDTH*0.4,HEIGH*0.40,200,100,function=settings)
+setingsButton=Button(WIDTH*0.4,HEIGH*0.40,ButtonX,ButtonY,textures=(settingsbutton1,settingsbutton2),function=settings)
 setingsButton.text="Настройки"
 setingsButton.set_parms(38,aligin=(2,20),color_backgroud=((255,255,255),(150,150,150)))
 
